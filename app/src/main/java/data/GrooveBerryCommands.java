@@ -13,6 +13,7 @@ public enum GrooveBerryCommands {
     VOLUME_DOWN("#VOLDOWN"),
     CURRENT_SONG("#SONG"),
     GET_READING_QUEUE("#LIST"),
+    GET_REMOTE_READING_QUEUE("#REMOTELIST"),
     EXIT("#EXIT");
 
     private String command;

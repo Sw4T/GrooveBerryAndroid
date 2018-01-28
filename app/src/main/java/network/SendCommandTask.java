@@ -6,9 +6,9 @@ import data.GrooveBerryCommands;
 
 public class SendCommandTask extends AsyncTask<GrooveBerryCommands, Void, Object> {
 
-    private GrooveBerrySocket socket;
+    private SocketCommands socket;
 
-    public SendCommandTask(GrooveBerrySocket socket) {
+    public SendCommandTask(SocketCommands socket) {
         this.socket = socket;
     }
 
@@ -16,7 +16,7 @@ public class SendCommandTask extends AsyncTask<GrooveBerryCommands, Void, Object
     protected Object doInBackground(GrooveBerryCommands... grooveBerryCommands)
     {
         GrooveBerryCommands commmandToSend = grooveBerryCommands[0];
-        if (commmandToSend == GrooveBerryCommands.GET_READING_QUEUE)
+        if (commmandToSend == GrooveBerryCommands.GET_REMOTE_READING_QUEUE)
         {
             try {
                 return (socket.getReadingQueue());
