@@ -1,17 +1,21 @@
 package network;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
 
+import activities.MainActivity;
+
 /**
  * Task which creates the socket with the remote server
  */
-public class ServerConnectTask extends AsyncTask<String, Void, SocketCommands> {
+public class ServerConnectTask extends AsyncTask<String, Void, GrooveBerrySocket> {
 
     public static final int PORT = 3008;
     private Context context;
@@ -21,37 +25,25 @@ public class ServerConnectTask extends AsyncTask<String, Void, SocketCommands> {
     }
 
     @Override
-    protected SocketCommands doInBackground(String... url)
+    protected GrooveBerrySocket doInBackground(String... url)
     {
-        if (haveNetworkConnection())
-        {
-            try {
-                return new SocketCommands(url[0], PORT);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                return null;
-            }
+        GrooveBerrySocket grooveBerrySocket = null;
+        try {
+            grooveBerrySocket = new GrooveBerrySocket(url[0], PORT);
+            String str = grooveBerrySocket.read();
+            Log.d("Server Welcome Message", str);
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        else {
-            Toast.makeText(context, "Your internet seems off, you have to turn it on to use the app", Toast.LENGTH_SHORT).show();
-            return null;
-        }
+        return grooveBerrySocket;
     }
 
-    private boolean haveNetworkConnection() {
-        boolean haveConnectedWifi = false;
-        boolean haveConnectedMobile = false;
-
-        ConnectivityManager cm = (ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
-        for (NetworkInfo ni : netInfo) {
-            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
-                if (ni.isConnected())
-                    haveConnectedWifi = true;
-            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
-                if (ni.isConnected())
-                    haveConnectedMobile = true;
+    @Override
+    protected void onPostExecute(GrooveBerrySocket socket)
+    {
+        if (socket == null) {
+            Toast.makeText(context, "Failed to connect to GrooveBerry server...", Toast.LENGTH_SHORT).show();
         }
-        return haveConnectedWifi || haveConnectedMobile;
     }
 }

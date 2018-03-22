@@ -3,15 +3,16 @@ package activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import network.ServerConnectTask;
-import network.SocketCommands;
 import highdevs.grooveberryandroid.R;
+import services.SocketHandlerService;
 
 public class LoginActivity extends Activity {
 
@@ -34,19 +35,33 @@ public class LoginActivity extends Activity {
         @Override
         public void onClick(View view) {
             String url = ET_Login.getText().toString();
-            if (!url.equals("") && url.contains((".")))
-            {
-                try {
-                    SocketCommands socket = new ServerConnectTask(context).execute(url).get();
-                    Intent startTheGrooveIntent = new Intent(context, MainActivity.class);
-                    startTheGrooveIntent.putExtra("socket", socket);
-                    startActivity(startTheGrooveIntent);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    Toast.makeText(context, "Failed to connect to GrooveBerry server...", Toast.LENGTH_SHORT).show();
-                }
+            if (!haveNetworkConnection()) {
+                Toast.makeText(context, "Your internet seems off, you have to turn it on to use the app", Toast.LENGTH_SHORT).show();
             }
-
+            else if (!url.equals("") && url.contains((".")))
+            {
+                Intent startTheGrooveIntent = new Intent(context, SocketHandlerService.class);
+                startTheGrooveIntent.putExtra("grooveberry-url", url);
+                startService(startTheGrooveIntent);
+            }
         }
     };
+
+    private boolean haveNetworkConnection()
+    {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
+    }
 }

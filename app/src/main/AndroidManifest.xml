@@ -11,13 +11,16 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="activities.MainActivity"></activity>
+        <activity android:name="activities.MainActivity"/>
         <activity android:name="activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name="services.SocketHandlerService"
+            android:exported="false" />
     </application>
 
 </manifest>
